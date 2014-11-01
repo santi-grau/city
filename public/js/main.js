@@ -77,7 +77,7 @@ var Neighborhood = Backbone.Model.extend({
 		var x = buildingData.x;
 		var y = buildingData.y;
 		var index = buildingData.index;
-		if(!x || !y || !buildingData.index){
+		if(!x || !y || !index){
 			console.log('not fit');
 			this.set('buildIndex', this.get('buildIndex') + 1);
 			this.build();
@@ -107,12 +107,13 @@ var Neighborhood = Backbone.Model.extend({
 				adjacents.push({ x: building.get('x') - 1 - X, y: building.get('y') - 1 - Y + p });
 				adjacents.push({ x: building.get('x') + building.get('X') + 1, y: building.get('y') - 1 - Y + p });
 			}
+			console.log('adjacents')
 			_.shuffle(adjacents).forEach(function(adjacent){
 				var fits = true;
 				for(p = 0; p < X * Y; p++ ){
-					if(positions.findWhere({ x: adjacent.x + Math.floor(p - X * Math.floor(p / X)), y: adjacent.y + Math.floor(p / X) })) fits = false;
+					if(positions.findWhere({ x: adjacent.x + Math.floor(p - X * Math.floor(p / X)), y: adjacent.y + Math.floor(p / X) })) return fits = false;
 				}
-				if(fits) return data = { x: adjacent.x, y: adjacent.y, index: building.get('index') + 1 };
+				if(fits) return data = { x: adjacent.x, y: adjacent.y, index: (building.get('index') + 1) };
 			});
 		});
 		return data;
