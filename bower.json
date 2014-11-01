@@ -1,0 +1,19 @@
+{
+  "name": "quark alien",
+  "version": "0.0.2",
+  "authors": [
+    "Santi Grau <santi.grau.torredemer@gmail.comgit>"
+  ],
+  "componentsDirectory": "public/js/libs",
+  "description": "mugshot analyzer",
+  "moduleType": [
+    "amd",
+    "node"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "backbone": "~1.1.2"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "alien",
+  "version": "0.0.0",
+  "description": "Quark Alien",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/santiago-grau/alien"
+  },
+  "keywords": [
+    "quark",
+    "alien"
+  ],
+  "author": "lct",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.9.7",
+    "jade": "~1.3.1",
+    "nib": "~1.0.3",
+    "stylus": "^0.49.2"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
