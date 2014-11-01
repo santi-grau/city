@@ -1,10 +1,10 @@
 var BuildingView = Backbone.View.extend({
 	initialize: function(){
-		console.log('Set building:');
-		console.log('width : ' + this.model.get('X'));
-		console.log('height : ' + this.model.get('Y'));
-		console.log('left : ' + this.model.get('x'));
-		console.log('top : ' + this.model.get('y'));
+		// console.log('Set building:');
+		// console.log('width : ' + this.model.get('X'));
+		// console.log('height : ' + this.model.get('Y'));
+		// console.log('left : ' + this.model.get('x'));
+		// console.log('top : ' + this.model.get('y'));
 		this.$el.css({
 			width : this.model.get('X'),
 			height : this.model.get('Y'),
@@ -78,7 +78,7 @@ var Neighborhood = Backbone.Model.extend({
 		var y = buildingData.y;
 		var index = buildingData.index;
 		if(!x || !y || !index){
-			console.log('not fit');
+			//console.log('not fit');
 			this.set('buildIndex', this.get('buildIndex') + 1);
 			this.build();
 		}else{
@@ -107,7 +107,7 @@ var Neighborhood = Backbone.Model.extend({
 				adjacents.push({ x: building.get('x') - 1 - X, y: building.get('y') - 1 - Y + p });
 				adjacents.push({ x: building.get('x') + building.get('X') + 1, y: building.get('y') - 1 - Y + p });
 			}
-			console.log('adjacents')
+			console.log(adjacents.length)
 			_.shuffle(adjacents).forEach(function(adjacent){
 				var fits = true;
 				for(p = 0; p < X * Y; p++ ){
@@ -119,7 +119,7 @@ var Neighborhood = Backbone.Model.extend({
 		return data;
 	},
 	step: function(){
-		console.log('neighborhood step');
+		//console.log('neighborhood step');
 		if(Math.random() < this.get('buildRatio')) this.build();
 		this.get('buildings').each(function(building){
 			_.bind(building.step, building)();
@@ -155,7 +155,7 @@ var City = Backbone.Model.extend({
 		console.log('--- step ---')
 		this.get('neighborhoods').each(function(neighborhood){
 			_.bind(neighborhood.step, neighborhood)();
-			if(Math.random() < neighborhood.get('spreadRatio')) console.log('spread');
+			//if(Math.random() < neighborhood.get('spreadRatio')) console.log('spread');
 		});
 	}
 });
