@@ -6,10 +6,13 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     title CITYSCAPES
     meta(name='description', content='')
-    link(rel='stylesheet', id='mainStylesheet' href='/css/main.css')
+    link(rel='stylesheet', id='mainStylesheet' href='/css/city2.css')
   body
-    div#grid
+    div#map
+    canvas
+
     script(src="js/libs/jquery/dist/jquery.min.js")
     script(src="js/libs/underscore/underscore-min.js")
     script(src="js/libs/backbone/backbone.js")
-    script(src="js/main.js")
+    script(src="js/libs/threejs/build/three.min.js")
+    script(src="js/city2.js")

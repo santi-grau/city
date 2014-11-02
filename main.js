@@ -32,8 +32,11 @@ app.use(express.static(__dirname + '/public'));
 // ┌────────────────────────────────────────────────────────────────────┐
 // | Routes
 // └────────────────────────────────────────────────────────────────────┘
-app.get('/', function(req, res){
-	res.render('index');
+app.get('/city1', function(req, res){
+	res.render('city1');
+});
+app.get('/city2', function(req, res){
+	res.render('city2');
 });
 
 // ┌────────────────────────────────────────────────────────────────────┐
