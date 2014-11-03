@@ -1,21 +1,34 @@
 var Noise = Backbone.Model.extend({
 	defaults: {
-		r : Math,
+		seed : new Date().getTime(),
+		x : null,
+		y : null,
 		grad3 : [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]],
 		p : [],
-		perm : [],
-		simplex : [[0,1,2,3],[0,1,3,2],[0,0,0,0],[0,2,3,1],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,2,3,0],[0,2,1,3],[0,0,0,0],[0,3,1,2],[0,3,2,1],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,3,2,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,2,0,3],[0,0,0,0],[1,3,0,2],[0,0,0,0],[0,0,0,0],[0,0,0,0],[2,3,0,1],[2,3,1,0],[1,0,2,3],[1,0,3,2],[0,0,0,0],[0,0,0,0],[0,0,0,0],[2,0,3,1],[0,0,0,0],[2,1,3,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[2,0,1,3],[0,0,0,0],[0,0,0,0],[0,0,0,0],[3,0,1,2],[3,0,2,1],[0,0,0,0],[3,1,2,0],[2,1,0,3],[0,0,0,0],[0,0,0,0],[0,0,0,0],[3,1,0,2],[0,0,0,0],[3,2,0,1],[3,2,1,0]]
+		perm : []
 	},
 	initialize: function(data){
-		if(data && data.r) this.set('r', data.r);
+		if(data && data.seed) this.set('seed', data.seed);
+		this.set({
+			x : this.get('seed') * 3253,
+			y : this.neighbor(36969)
+		});
 		var p = perm = [];
-		for (var i=0; i<256; i++) p[i] = perm[i] = perm[i+256] = Math.floor(this.get('r').random()*256);
+		for (var i=0; i<256; i++) p[i] = perm[i] = perm[i+256] = Math.floor(this.random()*256);
+		console.log(perm.join(','))
 		this.set('p', p);
 		this.set('perm', perm);
-		console.log(this.get('simplex').length)
 	},
-	dot: function(g, x, y){
-		return g[0]*x + g[1]*y;
+	neighbor: function(val){
+		return val * (this.get('x') & 65535) + (this.get('x') >> 16);
+	},
+	random: function(){
+		var num = this.get('x');
+		if (this.get('x') == 0) this.set('x', -1);
+		else this.set('x', this.neighbor(36969));
+		if (this.get('y') == 0) this.set('y', -1);
+		else this.set('y', this.neighbor(18273));
+		return ((this.get('x') << 16) + (this.get('y') & 65535)) / 4294967295 + 0.5;
 	},
 	noise: function(xin, yin){
 		var perm = this.get('perm');
@@ -52,65 +65,21 @@ var Noise = Backbone.Model.extend({
 		var gi2 = perm[ii+1+perm[jj+1]] % 12;
 		// Calculate the contribution from the three corners
 		var t0 = 0.5 - x0*x0-y0*y0;
-		if(t0<0) n0 = 0.0;
-		else {
-			t0 *= t0;
-			n0 = t0 * t0 * this.dot(grad3[gi0], x0, y0); // (x,y) of grad3 used for 2D gradient
-		}
 		var t1 = 0.5 - x1*x1-y1*y1;
-		if(t1<0) n1 = 0.0;
-		else {
-			t1 *= t1;
-			n1 = t1 * t1 * this.dot(grad3[gi1], x1, y1);
-		}
 		var t2 = 0.5 - x2*x2-y2*y2;
+		if(t0<0) n0 = 0.0;
+		else n0 = Math.pow(t0,2) * Math.pow(t0,2) * (grad3[gi0][0]*x0 + grad3[gi0][1]*y0); // (x,y) of grad3 used for 2D gradient
+		if(t1<0) n1 = 0.0;
+		else n1 = Math.pow(t1,2) * Math.pow(t1,2) * (grad3[gi1][0]*x1 + grad3[gi1][1]*y1);
 		if(t2<0) n2 = 0.0;
-		else {
-			t2 *= t2;
-			n2 = t2 * t2 * this.dot(grad3[gi2], x2, y2);
-		}
+		else n2 = Math.pow(t2,2) * Math.pow(t2,2) * (grad3[gi2][0]*x2+ grad3[gi2][1]*y2);
 		// Add contributions from each corner to get the final noise value.
 		// The result is scaled to return values in the interval [-1,1].
 		return 70.0 * (n0 + n1 + n2);
 	}
 })
 
-
-
-var SeedableRandom = Backbone.Model.extend({
-	defaults: {
-		seed : new Date().getTime(),
-		x : null,
-		y : null
-	},
-	initialize: function(data){
-		if(data && data.seed) this.set('seed', data.seed);
-		this.set({
-			x : this.get('seed') * 3253,
-			y : this.nextX()
-		});
-	},
-	random: function(){
-		var x = this.get('x');
-		var y = this.get('y');
-		if (x == 0) x == -1;
-		if (y == 0) y == -1;
-		this.set('x', this.nextX());
-		this.set('y', this.nextY());
-		return ((this.get('x') << 16) + (this.get('y') & 0xFFFF)) / 0xFFFFFFFF + 0.5;
-	},
-	nextX: function(){
-		return 36969 * (this.get('x') & 0xFFFF) + (this.get('x') >> 16);
-	},
-	nextY: function(){
-		return 18273 * (this.get('x') & 0xFFFF) + (this.get('x') >> 16);
-	},
-});
-
-
-var r = new SeedableRandom({ seed : 1414959060900 });
-// var r = new SeedableRandom();
-var p = new Noise({ r : r });
+var p = new Noise({ seed : 1 });
 // Dimensions of the landscape.
 var tilesHeight = 200;
 var tilesWidth = 200;
@@ -118,7 +87,6 @@ var tilesWidth = 200;
 
 // Gather our HTML template as an array of strings for output.
 var html = [];
-
 html.push("<table>");
 for (var y = 0; y < tilesHeight; y++) {
     html.push("<tr>");
@@ -164,4 +132,3 @@ for (var y = 0; y < tilesHeight; y++) {
 }
 html.push("</table>");
 document.getElementById("map").innerHTML += html.join("");
-console.log("Seed generation ------> " + r.get('seed'))
