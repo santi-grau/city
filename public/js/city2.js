@@ -83,8 +83,8 @@ var Noise = Backbone.Model.extend({
 
 var p = new Noise({ });
 // Dimensions of the landscape.
-var tilesHeight = 60;
-var tilesWidth = 60;
+var tilesHeight = 200;
+var tilesWidth = 200;
 // Gather our HTML template as an array of strings for output.
 var html = [];
 html.push("<table>");
