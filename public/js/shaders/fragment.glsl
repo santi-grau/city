@@ -1,6 +1,6 @@
 uniform float time;
 uniform vec2 resolution;
-uniform float seed;
+uniform float streetSeed;
 
 vec3 mod289(vec3 x) {
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -48,6 +48,6 @@ float turbulence( vec2 p ) {
 }
 void main( void ) {
 	vec2 position = gl_FragCoord.xy / resolution.xy;
-	float noise = 100.0 *  -2.0 * turbulence(20.0 * vec2( position.x , position.y - seed) );
+	float noise = 100.0 *  -2.0 * turbulence(20.0 * vec2( position.x , position.y - streetSeed) );
 	gl_FragColor = vec4( noise, noise, noise, 1.0 );
 }

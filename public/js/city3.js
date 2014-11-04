@@ -96,7 +96,7 @@ function render() {
 	gl.useProgram( currentProgram );
 	// Set values to program variables
 	gl.uniform1f( gl.getUniformLocation( currentProgram, 'time' ), parameters.time / 1000 );
-	gl.uniform1f( gl.getUniformLocation( currentProgram, 'seed' ), streetSeed );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'streetSeed' ), streetSeed );
 	gl.uniform2f( gl.getUniformLocation( currentProgram, 'resolution' ), parameters.screenWidth, parameters.screenHeight );
 	// Render geometry
 	gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
