@@ -104,4 +104,6 @@ function render() {
 	gl.disableVertexAttribArray( vertex_position );
 	stats.end();
 }
-
+window.onclick = function(){
+	
+}
