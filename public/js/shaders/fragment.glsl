@@ -1,5 +1,6 @@
 uniform float time;
 uniform vec2 resolution;
+uniform float seed;
 
 vec3 mod289(vec3 x) {
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -34,11 +35,10 @@ float snoise(vec2 v){
 	vec3 g;
 	g.x  = a0.x  * x0.x  + h.x  * x0.y;
 	g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-	return 50.0 * dot(m, g);
+	return 40.0 * dot(m, g);
 }
 
 float turbulence( vec2 p ) {
-	// float t = -abs(sin(time));
 	float t = -.3;
 	for (float f = 0.0 ; f <= 10.0 ; f++ ){
 		float power = pow( 1.0, f );
@@ -47,8 +47,7 @@ float turbulence( vec2 p ) {
 	return t;
 }
 void main( void ) {
-	float seed = 10.0;
-	vec2 position = - 1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
-	float noise = 100.0 *  -2.0 * turbulence(10.0 * vec2( position.x , position.y - seed) );
+	vec2 position = gl_FragCoord.xy / resolution.xy;
+	float noise = 100.0 *  -2.0 * turbulence(20.0 * vec2( position.x , position.y - seed) );
 	gl_FragColor = vec4( noise, noise, noise, 1.0 );
 }
