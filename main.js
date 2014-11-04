@@ -38,6 +38,9 @@ app.get('/city1', function(req, res){
 app.get('/city2', function(req, res){
 	res.render('city2');
 });
+app.get('/city3', function(req, res){
+	res.render('city3');
+});
 
 // ┌────────────────────────────────────────────────────────────────────┐
 // | Init!!
