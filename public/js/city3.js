@@ -44,7 +44,7 @@ function init() {
 	currentProgram = createProgram( vertex_shader, fragment_shader );
 	onWindowResize();
 	window.addEventListener( 'resize', onWindowResize, false );
-	document.body.appendChild( stats.domElement );
+	//document.body.appendChild( stats.domElement );
 }
 function createProgram( vertex, fragment ) {
 	var program = gl.createProgram();
