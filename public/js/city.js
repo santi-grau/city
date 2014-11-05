@@ -19,10 +19,10 @@ var heightSeed = Math.random()*1000;
 var growthSeed = Math.random()*1000;
 var levelSeed = Math.random()*1000;
 
-var dimension = 1.0;
-var deformation = 0.0;
-var forest = 0.2;
-var water = 0.2;
+var dimension = 0.5;
+var deformation = 0.5;
+var forest = 0.05;
+var water = 0.1;
 var cohesion = 0.4;
 var growth = 0.1;
 var height = 0.2;
@@ -80,11 +80,11 @@ var updateDeformation = function(value){
 	deformation = value;
 }
 var updateforest = function(value){
-	forest = value/2;
+	forest = value;
 	console.log(forest)
 }
 var updatewater = function(value){
-	water = 1.0 - value/2;
+	water = 1.0 - value;
 	console.log(water)
 }
 var updateCohesion = function(value){
@@ -101,7 +101,7 @@ var dimensionController = gui.add(text, 'dimension', 0, 1).onChange(updateDimens
 var deformationController = gui.add(text, 'deformation', 0, 1).onChange(updateDeformation);
 var forestController = gui.add(text, 'forest', 0, 1).onChange(updateforest);
 var waterController = gui.add(text, 'water', 0, 1).onChange(updatewater);
-var cohesionController = gui.add(text, 'cohesion', 0, 1).onChange(updateCohesion);
+var cohesionController = gui.add(text, 'cohesion', 0, 100).onChange(updateCohesion);
 var heightController = gui.add(text, 'height', 0.0, 1.0).onChange(updateHeight);
 gui.add(text, 'seed');
 
@@ -163,14 +163,14 @@ function render() {
 	gl.useProgram( currentProgram );
 	// Set values to program variables
 	gl.uniform1f( gl.getUniformLocation( currentProgram, 'seed' ), seed );
-	gl.uniform1f( gl.getUniformLocation( currentProgram, 'heightSeed' ), heightSeed );
-	gl.uniform1f( gl.getUniformLocation( currentProgram, 'growthSeed' ), growthSeed );
-	gl.uniform1f( gl.getUniformLocation( currentProgram, 'levelSeed' ), levelSeed );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'dimension' ), dimension);
 	gl.uniform1f( gl.getUniformLocation( currentProgram, 'deformation' ), deformation );
 	gl.uniform1f( gl.getUniformLocation( currentProgram, 'forest' ), forest );
 	gl.uniform1f( gl.getUniformLocation( currentProgram, 'water' ), water );
-	gl.uniform1f( gl.getUniformLocation( currentProgram, 'chession' ), 0.1 );
-	gl.uniform1f( gl.getUniformLocation( currentProgram, 'dimension' ), dimension);
+
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'cohesion' ), cohesion );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'height' ), height );
+	
 	gl.uniform2f( gl.getUniformLocation( currentProgram, 'resolution' ), parameters.screenWidth, parameters.screenHeight );
 	// Render geometry
 	gl.bindBuffer( gl.ARRAY_BUFFER, buffer );

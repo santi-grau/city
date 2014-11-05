@@ -1,12 +1,11 @@
 uniform vec2 resolution;
 uniform float seed;
-uniform float heightSeed;
-uniform float growthSeed;
-uniform float levelSeed;
+uniform float dimension;
 uniform float deformation;
 uniform float forest;
 uniform float water;
-uniform float dimension;
+uniform float cohesion;
+uniform float height;
 precision mediump float;
 
 
@@ -81,27 +80,22 @@ float turbulence( vec2 p ) {
 }
 
 bool pP(vec2 p, float noise){
-	if(length(vec2(p.x, p.y)) < dimension / 2.0 - noise * dimension / 1.8 * deformation && noise > forest && noise < water) return true;
+	if(length(vec2(p.x, p.y)) < dimension / 1.3 - noise * dimension * deformation / 1.5 && noise > forest && noise < water) return true;
 	else return false;
 }
 
 void main( void ) {
 	vec2 p = floor(gl_FragCoord.xy - resolution.xy / 2.0);
 	float noise = turbulence( vec2( gl_FragCoord.xy / resolution.xy ) + seed);
-	//float heightNoise = turbulence( vec2( gl_FragCoord.xy / resolution.xy ) * 3.0 + heightSeed );
-	//float growthNoise = turbulence( vec2( gl_FragCoord.xy / resolution.xy ) * 3.0 + growthSeed );
-	//float levelNoise = turbulence( vec2( gl_FragCoord.xy / resolution.xy ) * 3.0 + levelSeed );
-	//float height = heightNoise;
-	//float growth = growthNoise;
-	//float level = floor(levelNoise * 10.0) / 10.0;
 	float point = floor(noise * 10.0) / 10.0;
+	float h = height;
 	if( pP(p, noise) ){
-		gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
-	}else if( noise < forest && noise < 0.5){
-		gl_FragColor = vec4( 0.0, 1.0, 0.0, 1.0 );
-	}else if( noise > water && noise > 0.5){
-		gl_FragColor = vec4( 0.0, 0.0, 1.0, 1.0 );
+		gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 - length(p/dimension * 1.3) + floor(noise*10.0)/10.0 );
+	}else if( noise >= water){
+		gl_FragColor = vec4( 0.0, 0.0, 0.6, 1.0 );
+	} else if( noise <= forest){
+		gl_FragColor = vec4( 0.0, 0.6, 0.0, 1.0 );
 	} else{
-		gl_FragColor = vec4( 1.0 - point, 0.753 - point, 0.0, 1.0 );
+		gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
 	}
 }
