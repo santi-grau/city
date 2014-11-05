@@ -1,7 +1,7 @@
 uniform float time;
 uniform vec2 resolution;
 uniform float seed;
-
+precision mediump float;
 vec3 mod289(vec3 x) {
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -132,36 +132,14 @@ float cnoise(vec2 P){
 	float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
 	return 2.3 * n_xy;
 }
-
-
 float streetTurb( vec2 p ) {
-	float t = -.8;
+	float t = -.5;
 	for (float f = 0.0 ; f <= 10.0 ; f++ ){
 		float power = pow( 1.0, f );
-		t += abs( snoise( vec2( power * p )) / power );
-	}
-	return t;
-}
-
-float cityTurb(vec2 p ){
-	float t = 0.5;
-	for (float f = 0.0 ; f <= 1.0 ; f++ ){
-		float power = pow( 20.5, f );
-		t += abs( snoise( vec2( power * p )) / power );
-	}
-	return t;
-}
-
-float areaTurb(vec2 p ){
-	float t = 0.5;
-	for (float f = 0.0 ; f <= 10.0 ; f++ ){
-		float power = pow( 2.0, f );
 		t += abs( pnoise( vec2( power * p ), vec2( 10.0, 10.0 ) ) / power );
 	}
 	return t;
 }
-
-
 float turbulence( vec2 p ) {
 	float t = -.1;
 	for (float f = 1.0 ; f <= 10.0 ; f++ ){
@@ -170,13 +148,19 @@ float turbulence( vec2 p ) {
 	}
 	return t;
 }
-
+float module = 6.0;
+float aspectRatio = resolution.y / resolution.x;
+float deformation = 0.6;
+float whitespace = 0.0001;
 void main( void ) {
-	float color = 1.0;
-	vec2 position = - 1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
-	// color = 100.0 * -2.0 * streetTurb(20.0 * vec2( position.x , position.y - seed) );
-	// areas
-	color = turbulence( vec2( gl_FragCoord.xy) / 1280.0 + seed);
-	//float color = areaTurb( vec2( position - seed) );
-	gl_FragColor = vec4( vec3(color), 1.0 );
+	float disp = resolution.x / 2.0;
+	if(aspectRatio < 1.0){ disp = resolution.y / 2.0; }
+	vec2 position = gl_FragCoord.xy - resolution.xy / 2.0;
+	//float streets = 100.0 * streetTurb( vec2(  gl_FragCoord.xy / resolution.xy * 10.0 ) + seed);
+	float building = turbulence( vec2(  gl_FragCoord.xy / resolution.xy ) + seed);
+	if(mod(position.y + (module/2.0), module) == 0.0 && mod(position.x + (module/2.0), module) == 0.0 && length(vec2(position.x, position.y)) < disp * 1.0  - building * disp * deformation && building > whitespace){
+		gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
+	}else{
+		gl_FragColor = vec4( vec3(1.0), 1.0 );
+	}
 }
