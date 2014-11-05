@@ -15,6 +15,18 @@ window.requestAnimationFrame = window.requestAnimationFrame || ( function() {
 var stats = new Stats();
 
 var seed = Math.random()*1000;
+var heightSeed = Math.random()*1000;
+var growthSeed = Math.random()*1000;
+var levelSeed = Math.random()*1000;
+
+var dimension = 1.0;
+var deformation = 0.0;
+var forest = 0.2;
+var water = 0.2;
+var cohesion = 0.4;
+var growth = 0.1;
+var height = 0.2;
+
 var canvas;
 var gl;
 var buffer;
@@ -30,22 +42,78 @@ var parameters = {
 	screenHeight: 0
 };
 
-init();
-animate();
-function init() {
-	vertex_shader = vertex;
-	fragment_shader = fragment;
-	canvas = document.querySelector( 'canvas' );
-	try { gl = canvas.getContext( 'experimental-webgl' ); } catch( error ) { }
-	if ( !gl ) throw "cannot create webgl context";
-	buffer = gl.createBuffer();
-	gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-	gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( [ - 1.0, - 1.0, 1.0, - 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0 ] ), gl.STATIC_DRAW );
-	currentProgram = createProgram( vertex_shader, fragment_shader );
-	onWindowResize();
-	window.addEventListener( 'resize', onWindowResize, false );
-	//document.body.appendChild( stats.domElement );
+
+vertex_shader = vertex;
+fragment_shader = fragment;
+canvas = document.querySelector( 'canvas' );
+try { gl = canvas.getContext( 'experimental-webgl' ); } catch( error ) { }
+if ( !gl ) throw "cannot create webgl context";
+buffer = gl.createBuffer();
+gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( [ - 1.0, - 1.0, 1.0, - 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0, 1.0, - 1.0, 1.0 ] ), gl.STATIC_DRAW );
+currentProgram = createProgram( vertex_shader, fragment_shader );
+onWindowResize();
+window.addEventListener( 'resize', onWindowResize, false );
+document.body.appendChild( stats.domElement );
+
+var Controls = function() {
+	this.dimension = dimension;
+	this.deformation = deformation;
+	this.forest = forest;
+	this.water = water;
+	this.cohesion = cohesion;
+	this.height = height;
+	this.seed = function(){
+		newSeed();
+	};
+};
+
+var updateDimension = function(value){
+	var limit;
+	var aspectRatio = canvas.height / canvas.width;
+	if(aspectRatio < 1) limit = canvas.height;
+	else limit = canvas.width;
+	dimension = Math.floor(limit * value);
+	console.log(dimension)
 }
+var updateDeformation = function(value){
+	deformation = value;
+}
+var updateforest = function(value){
+	forest = value/2;
+	console.log(forest)
+}
+var updatewater = function(value){
+	water = 1.0 - value/2;
+	console.log(water)
+}
+var updateCohesion = function(value){
+	cohesion = Math.floor(value * 10);
+	console.log(cohesion)
+}
+var updateHeight = function(value){
+	height = value;
+}
+
+var text = new Controls();
+var gui = new dat.GUI();
+var dimensionController = gui.add(text, 'dimension', 0, 1).onChange(updateDimension);
+var deformationController = gui.add(text, 'deformation', 0, 1).onChange(updateDeformation);
+var forestController = gui.add(text, 'forest', 0, 1).onChange(updateforest);
+var waterController = gui.add(text, 'water', 0, 1).onChange(updatewater);
+var cohesionController = gui.add(text, 'cohesion', 0, 1).onChange(updateCohesion);
+var heightController = gui.add(text, 'height', 0.0, 1.0).onChange(updateHeight);
+gui.add(text, 'seed');
+
+updateDimension(dimension);
+updateDeformation(deformation);
+updateforest(forest);
+updatewater(water);
+updateCohesion(cohesion);
+updateHeight(height);
+
+
+render();
 function createProgram( vertex, fragment ) {
 	var program = gl.createProgram();
 	var vs = createShader( vertex, gl.VERTEX_SHADER );
@@ -84,8 +152,7 @@ function onWindowResize( event ) {
 	gl.viewport( 0, 0, canvas.width, canvas.height );
 }
 function animate() {
-	requestAnimationFrame( animate );
-	render();
+	
 }
 function render() {
 	if ( !currentProgram ) return;
@@ -95,8 +162,15 @@ function render() {
 	// Load program into GPU
 	gl.useProgram( currentProgram );
 	// Set values to program variables
-	gl.uniform1f( gl.getUniformLocation( currentProgram, 'time' ), parameters.time / 1000 );
 	gl.uniform1f( gl.getUniformLocation( currentProgram, 'seed' ), seed );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'heightSeed' ), heightSeed );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'growthSeed' ), growthSeed );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'levelSeed' ), levelSeed );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'deformation' ), deformation );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'forest' ), forest );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'water' ), water );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'chession' ), 0.1 );
+	gl.uniform1f( gl.getUniformLocation( currentProgram, 'dimension' ), dimension);
 	gl.uniform2f( gl.getUniformLocation( currentProgram, 'resolution' ), parameters.screenWidth, parameters.screenHeight );
 	// Render geometry
 	gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
@@ -105,8 +179,11 @@ function render() {
 	gl.drawArrays( gl.TRIANGLES, 0, 6 );
 	gl.disableVertexAttribArray( vertex_position );
 	stats.end();
+	requestAnimationFrame( render );
 }
-window.onclick = function(){
+var newSeed = function(){
 	seed = Math.random()*1000;
-	console.log(seed)
+	heightSeed = Math.random()*1000;
+	growthSeed = Math.random()*1000;
+	levelSeed = Math.random()*1000;
 }
