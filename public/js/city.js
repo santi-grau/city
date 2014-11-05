@@ -25,7 +25,7 @@ var forest = 0.05;
 var water = 0.1;
 var cohesion = 0.4;
 var growth = 0.1;
-var height = 0.2;
+var height = 0.8;
 
 var canvas;
 var gl;

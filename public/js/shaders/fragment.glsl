@@ -8,21 +8,6 @@ uniform float cohesion;
 uniform float height;
 precision mediump float;
 
-
-//
-// GLSL textureless classic 2D noise "cnoise",
-// with an RSL-style periodic variant "pnoise".
-// Author:	Stefan Gustavson (stefan.gustavson@liu.se)
-// Version: 2011-08-22
-//
-// Many thanks to Ian McEwan of Ashima Arts for the
-// ideas for permutation and gradient selection.
-//
-// Copyright (c) 2011 Stefan Gustavson. All rights reserved.
-// Distributed under the MIT license. See LICENSE file.
-// https://github.com/ashima/webgl-noise
-//
-
 vec4 mod289(vec4 x){
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -78,6 +63,14 @@ float turbulence( vec2 p ) {
 	}
 	return t;
 }
+float turbulence2( vec2 p ) {
+	float t = -0.1;
+	for (float f = 1.0 ; f <= 10.0 ; f++ ){
+		float power = pow( 1.5, f );
+		t += abs( pnoise( vec2( power * p ), vec2( 10.0, 10.0 ) ) / power );
+	}
+	return t;
+}
 
 bool pP(vec2 p, float noise){
 	if(length(vec2(p.x, p.y)) < dimension / 1.3 - noise * dimension * deformation / 1.5 && noise > forest && noise < water) return true;
@@ -87,15 +80,18 @@ bool pP(vec2 p, float noise){
 void main( void ) {
 	vec2 p = floor(gl_FragCoord.xy - resolution.xy / 2.0);
 	float noise = turbulence( vec2( gl_FragCoord.xy / resolution.xy ) + seed);
-	float point = floor(noise * 10.0) / 10.0;
-	float h = height;
+	float noise2 = turbulence2( vec2( gl_FragCoord.xy / resolution.xy ) + seed/2.0);
 	if( pP(p, noise) ){
-		gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 - length(p/dimension * 1.3) + floor(noise*10.0)/10.0 );
+		if(mod(p.x,8.0) == 0.0 || mod(p.y,8.0) == 0.0){
+			gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
+		}else{
+			gl_FragColor = vec4( 0.0, 0.0, 0.0, (1.0 - length(p/dimension * 1.9) + noise2) * height );
+		}
 	}else if( noise >= water){
 		gl_FragColor = vec4( 0.0, 0.0, 0.6, 1.0 );
 	} else if( noise <= forest){
 		gl_FragColor = vec4( 0.0, 0.6, 0.0, 1.0 );
 	} else{
-		gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+		gl_FragColor = vec4( 0.25, 0.25, 0.25, 1.0 );
 	}
 }
